@@ -78,3 +78,6 @@ const main = async () => {
         }
     }
 }
+
+// ajout d'élément dans le panier 
+const addCart = document.getElementById('addToCart')

@@ -15,7 +15,7 @@ const $items = document.querySelector('.items')
 const createProductImg = product => {
     const $productImg = document.createElement('img')
 
-    $productImg.setAttribute('src', `../../back/images/${product.imageUrl}`)
+    $productImg.setAttribute('src', `http://localhost:3000/images/${product.imageUrl}`)
     $productImg.setAttribute('alt', `${product.altTxt}`)
     
     return $productImg
