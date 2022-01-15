@@ -1,16 +1,16 @@
 // Récupere les produits de l'API
 const retrieveProductsData = () => {
     fetch('http://localhost:3000/api/products')
-    .then(res = res.json())
-    .then(data = data.products)
-    console.log(data)
-    .catch(err = console.log("erreur", err))
+    .then(res => res.json())
+    // .then(data => res)
+    .catch(err => console.log("erreur", err))
 }
 
 // Récupere le produit de la page
 const findProduct = () => {
-    const $url = window.location.pathname
-    const $idProducts = $url.searchParams.get('id')
+    var string = window.location.href
+    var url = new URL(string)
+    const $idProducts = url.searchParams.get('id')
 
     return $idProducts
 }
@@ -26,7 +26,7 @@ const $itemColors = document.getElementById('colors')
 const addingImage = product => {
     const $productImage = document.createElement('img')
 
-    $productImage.setAttribute('src', `../../back/images/${product.imageUrl}`)
+    $productImage.setAttribute('src', `http://localhost:3000/images/${product.imageUrl}`)
     $productImage.setAttribute('alt', `${product.altTxt}`)
 
     return $itemImg.appendChild($productImage)
@@ -78,6 +78,15 @@ const main = async () => {
         }
     }
 }
+main()
 
 // ajout d'élément dans le panier 
 const addCart = document.getElementById('addToCart')
+addCart.addEventListener('click', event => {
+    var cart = {
+        id : findProduct(),
+        quantity : document.getElementById('quantity').value,
+        colors : document.getElementById('colors').value 
+    }
+    localStorage.setItem('storageCart', JSON.stringify(cart))
+})

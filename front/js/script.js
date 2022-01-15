@@ -1,10 +1,13 @@
 // Récupere les produits de l'API
 const retrieveProductsData = () => {
     fetch('http://localhost:3000/api/products')
-    .then(res = res.json())
-    .then(data = data.products)
-    console.log(data)
-    .catch(err = console.log("erreur", err))
+    .then(function(res) {
+        return res.json();
+    })
+    .then(function(data) {
+        main(data);
+    })
+    .catch(err => console.log("erreur", err))
 }
 
 
@@ -15,7 +18,7 @@ const $items = document.querySelector('.items')
 const createProductImg = product => {
     const $productImg = document.createElement('img')
 
-    $productImg.setAttribute('src', `http://localhost:3000/images/${product.imageUrl}`)
+    $productImg.setAttribute('src', `${product.imageUrl}`)
     $productImg.setAttribute('alt', `${product.altTxt}`)
     
     return $productImg
@@ -59,10 +62,11 @@ const createProductCard = product => {
 }
 
 // Affichage des Produits
-const main = async () => {
-    const products = await retrieveProductsData()
-    console.log(products)
+const main = (products) => {
+    // const products = await retrieveProductsData()
     for ( let product of products) {
         $items.appendChild(createProductCard(product))
     }
 }
+
+retrieveProductsData()
