@@ -86,10 +86,19 @@ retrieveProductsData()
 // ajout d'élément dans le panier 
 const addCart = document.getElementById('addToCart')
 addCart.addEventListener('click', event => {
+    var count = localStorage.length
+    count++; 
     var cart = {
         id : findProduct(),
         quantity : document.getElementById('quantity').value,
         colors : document.getElementById('colors').value 
     }
-    localStorage.setItem('storageCart', JSON.stringify(cart))
+    for ( element = 0 ; element < localStorage.length ; element++) {
+        if ((cart[id] === element[id])&&(element[colors] === cart[colors])){
+            element[quantity] += cart[quantity]
+        } else {
+            localStorage.setItem(`cartStorage${count}`, JSON.stringify(cart))
+        }
+    }
+    console.log(localStorage)
 })
