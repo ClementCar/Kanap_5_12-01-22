@@ -1,9 +1,7 @@
 // Récupere les produits de l'API
 const retrieveProductsData = () => {
     fetch('http://localhost:3000/api/products')
-    .then(function(res) {
-        return res.json();
-    })
+    .then(res => res.json())
     .then(function(data) {
         main(data);
     })
@@ -29,7 +27,7 @@ const createProductImg = product => {
 const createProductTitle = product => {
     const $productTitle = document.createElement('h3')
 
-    $productTitle.textContent(`${product.name}`)
+    $productTitle.textContent = `${product.name}`
     $productTitle.classList.add('ProductName')
 
     return $productTitle
@@ -40,7 +38,7 @@ const createProductTitle = product => {
 const createProductDescription = product => {
     const $productDescription = document.createElement('p')
 
-    $productDescription.textContent(`${product.description}`)
+    $productDescription.textContent = `${product.description}`
     $productDescription.classList.add('productDescription')
 
     return $productDescription
@@ -63,9 +61,9 @@ const createProductCard = product => {
 
 // Affichage des Produits
 const main = (products) => {
-    // const products = await retrieveProductsData()
-    for ( let product of products) {
-        $items.appendChild(createProductCard(product))
+    console.table(products)
+    for ( let product = 0 ; product < products.length ; product++) {
+        $items.appendChild(createProductCard(products[product]))
     }
 }
 

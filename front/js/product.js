@@ -1,8 +1,13 @@
-// Récupere les produits de l'API
+// Récupere l'id produit de la page et recherche dans l'api les données du produit
 const retrieveProductsData = () => {
-    fetch('http://localhost:3000/api/products')
+    var string = window.location.href
+    var url = new URL(string)
+    const $idProducts = url.searchParams.get('id')
+    fetch(`http://127.0.0.1:3000/api/products/${$idProducts}`)
     .then(res => res.json())
-    // .then(data => res)
+    .then(function(data) {
+        main(data)
+    })
     .catch(err => console.log("erreur", err))
 }
 
@@ -26,7 +31,7 @@ const $itemColors = document.getElementById('colors')
 const addingImage = product => {
     const $productImage = document.createElement('img')
 
-    $productImage.setAttribute('src', `http://localhost:3000/images/${product.imageUrl}`)
+    $productImage.setAttribute('src', `${product.imageUrl}`)
     $productImage.setAttribute('alt', `${product.altTxt}`)
 
     return $itemImg.appendChild($productImage)
@@ -55,30 +60,28 @@ const addingDescription = product => {
 
 // ajout option couleurs produit 
 const addingColors = product => {
-    var $option = document.createElement('option')
-    for ( let color of product.colors){
-        $option = document.setAttribute('value', color)
-        $option.textContent = color
-        $itemColors.appendChild($option)
+    var $option = new Array()
+    for (let numberColor = 0 ; numberColor < product.colors.length ; numberColor++) {
+        $option[numberColor] = document.createElement('option')
+        $option[numberColor].setAttribute('value', product.colors[numberColor])
+        $option[numberColor].textContent = product.colors[numberColor]
+        $itemColors.appendChild($option[numberColor])
     }
 }
 
 
 // Affichage informations du produit
-const main = async () => {
-    const products = await retrieveProductsData()
-    const $idProducts = await findProduct()
-    for (let product of products ) {
-        if ( product._id === $idProducts) {
-            addingImage(product)
-            addingTitle(product)
-            addingPrice(product)
-            addingDescription(product)
-            addingColors(product)
-        }
-    }
+const main = async (products) => {
+    console.table(products)
+    addingImage(products)
+    addingTitle(products)
+    addingPrice(products)
+    addingDescription(products)
+    addingColors(products)
+    
 }
-main()
+
+retrieveProductsData()
 
 // ajout d'élément dans le panier 
 const addCart = document.getElementById('addToCart')
