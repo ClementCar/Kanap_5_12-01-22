@@ -6,4 +6,11 @@ const showApiProduct = product => {
     const $productArticle = document.createElement('article')
     $productArticle.classList.add('cart__item')
     $productArticle.setAttribute('data-id', `${product._id}`)
+    $productArticle.setAttribute('data-color', colorrr)
+
+    const $itemImage = document.createElement('div')
+    $itemImage.classList.add('cart__item__content')
+    const $image = document.createElement('img')
+    $image.setAttribute('src', `${product.imageUrl}`)
+    $image.setAttribute('alt', )
 }
