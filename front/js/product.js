@@ -94,8 +94,8 @@ addCart.addEventListener('click', event => {
         colors : document.getElementById('colors').value 
     }
     for ( element = 0 ; element < localStorage.length ; element++) {
-        if ((cart[id] === element[id])&&(element[colors] === cart[colors])){
-            element[quantity] += cart[quantity]
+        if ((cart.id === element.id)&&(element.colors === cart.colors)){
+            element.quantity += cart.quantity
         } else {
             localStorage.setItem(`cartStorage${count}`, JSON.stringify(cart))
         }
