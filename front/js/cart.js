@@ -75,13 +75,15 @@ const retrieveProduct = (id, color, quantity) => {
     .then((data) => {
         console.table(data)
         showApiProduct(data, color, quantity)
+
+        // A chaque passage, le prix * la quantité et la quantité des produit s'accumulent et s'affichent 
         totalPrice += data.price * quantity
         totalQuantity += parseInt(quantity)
         document.getElementById('totalQuantity').textContent = totalQuantity
         document.getElementById('totalPrice').textContent = totalPrice
-        
-        const deleteItem = document.getElementById('cart__items')
+        console.log(document.querySelectorAll('.deleteItem'))
     })
+    .catch(err => console.log("erreur", err))
 }
 
 // Appel l'affichage pour chaque produit du panier 
@@ -93,15 +95,16 @@ const main = () => {
             console.log(storage)
             retrieveProduct(storage.id, storage.colors, storage.quantity)
         }
-        console.log(document.querySelectorAll('.deleteItem'))
     } else {
         // message de panier vide 
     }
 }
 
-main()
-
-deleteItem.addEventListener('click', event => {
+async function listen() {
+    await main();
+    var deleteItem = document.querySelectorAll('#order')
+    console.log(deleteItem)
+    deleteItem.addEventListener('click', () => {
     const $deleteArticle = deleteItem.closest('article')
     const $deleteId = $deleteArticle.dataset.id
     const $deleteColor = $deleteArticle.dataset.color
@@ -109,27 +112,52 @@ deleteItem.addEventListener('click', event => {
     console.log($deleteColor)
     // for ( element = 0 ; element < localStorage.length ; element++) {
     //     var storage = JSON.parse(localStorage.getItem(`cartStorage${element}`))
-
+    
     //     // Si le produit est déja dans le panier, on le remplace avec la nouvelle quantité
     //     if (( $deleteId === storage.id)&&(storage.colors === $deleteColor)) {
     //         localStorage.removeItem(`cartStorage${element}`)
     //     }
     // }
-})
+    })
+}
 
-changeQuantity.addEventListener('change', event => {
-    const changeArticle = changeQuantity.closest('article')
-    const $changeId = $deleteArticle.dataset.id
-    const $changeColor = $deleteArticle.dataset.color
-    for ( element = 0 ; element < localStorage.length ; element++) {
-        var storage = JSON.parse(localStorage.getItem(`cartStorage${element}`))
+listen()
 
-        // Si le produit est déja dans le panier, on le remplace avec la nouvelle quantité
-        if (($changeId === storage.id)&&(storage.colors === $changeColor)) {
-            var newQuantity = parseInt(cart.quantity) + parseInt(storage.quantity)
-            cart.quantity = newQuantity
-            localStorage.removeItem(`cartStorage${element}`)
-            localStorage.setItem(`cartStorage${element}`, JSON.stringify(cart))
-        }
-    }
-})
+// changeQuantity.addEventListener('change', event => {
+//     const changeArticle = changeQuantity.closest('article')
+//     const $changeId = $deleteArticle.dataset.id
+//     const $changeColor = $deleteArticle.dataset.color
+//     for ( element = 0 ; element < localStorage.length ; element++) {
+//         var storage = JSON.parse(localStorage.getItem(`cartStorage${element}`))
+
+//         // Si le produit est déja dans le panier, on le remplace avec la nouvelle quantité
+//         if (($changeId === storage.id)&&(storage.colors === $changeColor)) {
+//             var newQuantity = parseInt(cart.quantity) + parseInt(storage.quantity)
+//             storage.quantity = newQuantity
+//             localStorage.removeItem(`cartStorage${element}`)
+//             localStorage.setItem(`cartStorage${element}`, JSON.stringify(storage))
+//         }
+//     }
+// })
+
+
+
+
+
+// Récupération des données du formulaires
+const firstName = document.getElementById('firstName')
+const firstNameError = document.getElementById('firstNameErrorMsg')
+const lastName = document.getElementById('lastName')
+const lastNameError = document.getElementById('lastNameErrorMsg')
+const address = document.getElementById('address')
+const addressError = document.getElementById('addressErrorMsg')
+const city = document.getElementById('city')
+const cityError = document.getElementById('cityErrorMsg')
+const email = document.getElementById('email')
+const emailError = document.getElementById('emailErrorMsg')
+
+// Règles regex
+const validFlc = RegExp()
+const validAddress = RegExp()
+const validEmail = RegExp()
+
