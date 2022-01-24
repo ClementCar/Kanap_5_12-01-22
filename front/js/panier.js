@@ -1,32 +1,20 @@
 var totalQuantity = 0
 var totalPrice = 0
 
-// retrouve pr
-const retrievedddd = (id) => {
-    fetch(`http://127.0.0.1:3000/api/products/${id}`)
-    .then(res => res.json())
-    .then(data => {
-        console.log(data)
-        return(data);
-    })
-    .catch(err => console.log("erreur", err))
-}
-
-
 // récupere la section du panier 
 const $cart__items = document.getElementById('cart__items')
 
 // Afficher le produit via l'API et les infos de local Storage
-const showApiProduct = (product, pColor, pQuantity) => {
+const showApiProduct = (product) => {
     const $productArticle = document.createElement('article')
     $productArticle.classList.add('cart__item')
-    $productArticle.setAttribute('data-id', `${product._id}`)
-    $productArticle.setAttribute('data-color', pColor)
+    $productArticle.setAttribute('data-id', `${product.id}`)
+    $productArticle.setAttribute('data-color', `${product.colors}`)
 
     const $itemImage = document.createElement('div')
     $itemImage.classList.add('cart__item__img')
     const $image = document.createElement('img')
-    $image.setAttribute('src', `${product.imageUrl}`)
+    $image.setAttribute('src', `${product.image}`)
     $image.setAttribute('alt', `${product.altTxt}`)
     $itemImage.appendChild($image)
 
@@ -38,7 +26,7 @@ const showApiProduct = (product, pColor, pQuantity) => {
     const $descriptionName = document.createElement('h2')
     $descriptionName.textContent = `${product.name}`
     const $descriptionColor = document.createElement('p')
-    $descriptionColor.textContent = pColor
+    $descriptionColor.textContent = `${product.colors}`
     const $descriptionPrice = document.createElement('p')
     $descriptionPrice.textContent = `${product.price}`
     $contentDescription.appendChild($descriptionName)
@@ -57,7 +45,7 @@ const showApiProduct = (product, pColor, pQuantity) => {
     $quantityInput.setAttribute('name', 'itemQuantity')
     $quantityInput.setAttribute('min', '1')
     $quantityInput.setAttribute('max', '100')
-    $quantityInput.setAttribute('value', `${pQuantity}`)
+    $quantityInput.setAttribute('value', `${product.quantity}`)
     $settingQuantity.appendChild($quantityP)
     $settingQuantity.appendChild($quantityInput)
     const $settingDelete = document.createElement('div')
@@ -81,36 +69,44 @@ const showApiProduct = (product, pColor, pQuantity) => {
 
 // Recherche le produit dans l'API et appel l'affichage du panier avec 
 // l'id la couleur et la quantité contenu dans local Storage
-const retrieveProduct = async () => {
+const retrieveProduct = (id, color, quantity) => {
+    fetch(`http://127.0.0.1:3000/api/products/${id}`)
+    .then(res => res.json())
+    .then((data) => {
+        console.table(data)
+        showApiProduct(data, color, quantity)
+
+        // A chaque passage, le prix * la quantité et la quantité des produit s'accumulent et s'affichent 
+        totalPrice += data.price * quantity
+        totalQuantity += parseInt(quantity)
+        document.getElementById('totalQuantity').textContent = totalQuantity
+        document.getElementById('totalPrice').textContent = totalPrice
+        console.log(document.querySelectorAll('.deleteItem'))
+        listen()
+    })
+    .catch(err => console.log("erreur", err))
+}
+
+// Appel l'affichage pour chaque produit du panier 
+const main = async () => {
     var articleCart = localStorage.length
     if ( articleCart > 0) {
         for ( element = 0 ; element < localStorage.length ; element++) {
             var storage = JSON.parse(localStorage.getItem(`cartStorage${element}`))
             console.log(storage)
-            const product = retrievedddd(storage.id)
-            console.table(product)
-            // main(product, storage.colors, storage.quantity)
+            await showApiProduct(storage)
+            totalPrice += storage.price * storage.quantity
+            totalQuantity += parseInt(storage.quantity)
+            document.getElementById('totalQuantity').textContent = totalQuantity
+            document.getElementById('totalPrice').textContent = totalPrice
         }
+        listen()
     } else {
         // message de panier vide 
     }
 }
 
-// Appel l'affichage pour chaque produit du panier 
-const main = (data, color, quantity) => {
-    console.table(data)
-    showApiProduct(data, color, quantity)
-
-    // A chaque passage, le prix * la quantité et la quantité des produit s'accumulent et s'affichent 
-    totalPrice += data.price * quantity
-    totalQuantity += parseInt(quantity)
-    document.getElementById('totalQuantity').textContent = totalQuantity
-    document.getElementById('totalPrice').textContent = totalPrice
-    console.log(document.querySelectorAll('.deleteItem'))
-    listen()
-}
-
-retrieveProduct()
+main()
 
 function listen() {
     var deleteItem = document.querySelectorAll('.deleteItem')
@@ -122,15 +118,18 @@ function listen() {
         const $deleteColor = $deleteArticle.dataset.color
         console.log($deleteId)
         console.log($deleteColor)
-        // for ( element = 0 ; element < localStorage.length ; element++) {
-        //     var storage = JSON.parse(localStorage.getItem(`cartStorage${element}`))
-            
-        //     // Si le produit est déja dans le panier, on le remplace avec la nouvelle quantité
-        //     if (( $deleteId === storage.id)&&(storage.colors === $deleteColor)) {
-        //         localStorage.removeItem(`cartStorage${element}`)
-        //     }
-        // }
-        
+        for ( element = 0 ; element < localStorage.length ; element++) {
+            var storage = JSON.parse(localStorage.getItem(`cartStorage${element}`))
+            console.log(storage.id)
+            console.log(storage.colors)
+
+            // Si le produit est déja dans le panier, on le remplace avec la nouvelle quantité
+            if (( $deleteId === storage.id)&&(storage.colors === $deleteColor)) {
+                localStorage.removeItem(`cartStorage${element}`)
+            }
+        }
+        window.location.reload()
+        alert('Produit supprimé du panier')
     }))
 }
 
@@ -171,4 +170,3 @@ const emailError = document.getElementById('emailErrorMsg')
 const validFlc = RegExp()
 const validAddress = RegExp()
 const validEmail = RegExp()
-
