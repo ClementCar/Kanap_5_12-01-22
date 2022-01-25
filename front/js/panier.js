@@ -1,11 +1,22 @@
 var totalQuantity = 0
 var totalPrice = 0
 
+// Récupere les produits de l'API pour récupérer le prix
+const retrieveProductsData = () => {
+    fetch('http://localhost:3000/api/products')
+    .then(res => res.json())
+    .then(function(data) {
+        main(data);
+    })
+    .catch(err => console.log("erreur", err))
+}
+
+
 // récupere la section du panier 
 const $cart__items = document.getElementById('cart__items')
 
 // Afficher le produit via l'API et les infos de local Storage
-const showApiProduct = (product) => {
+const showApiProduct = (product, price) => {
     const $productArticle = document.createElement('article')
     $productArticle.classList.add('cart__item')
     $productArticle.setAttribute('data-id', `${product.id}`)
@@ -28,7 +39,7 @@ const showApiProduct = (product) => {
     const $descriptionColor = document.createElement('p')
     $descriptionColor.textContent = `${product.colors}`
     const $descriptionPrice = document.createElement('p')
-    $descriptionPrice.textContent = `${product.price}`
+    $descriptionPrice.textContent = `${price}`
     $contentDescription.appendChild($descriptionName)
     $contentDescription.appendChild($descriptionColor)
     $contentDescription.appendChild($descriptionPrice)
@@ -67,38 +78,24 @@ const showApiProduct = (product) => {
     $cart__items.appendChild($productArticle)
 }
 
-// Recherche le produit dans l'API et appel l'affichage du panier avec 
-// l'id la couleur et la quantité contenu dans local Storage
-const retrieveProduct = (id, color, quantity) => {
-    fetch(`http://127.0.0.1:3000/api/products/${id}`)
-    .then(res => res.json())
-    .then((data) => {
-        console.table(data)
-        showApiProduct(data, color, quantity)
-
-        // A chaque passage, le prix * la quantité et la quantité des produit s'accumulent et s'affichent 
-        totalPrice += data.price * quantity
-        totalQuantity += parseInt(quantity)
-        document.getElementById('totalQuantity').textContent = totalQuantity
-        document.getElementById('totalPrice').textContent = totalPrice
-        console.log(document.querySelectorAll('.deleteItem'))
-        listen()
-    })
-    .catch(err => console.log("erreur", err))
-}
-
 // Appel l'affichage pour chaque produit du panier 
-const main = async () => {
+const main = async (products) => {
     var articleCart = localStorage.length
+    console.table(products)
     if ( articleCart > 0) {
         for ( element = 0 ; element < localStorage.length ; element++) {
             var storage = JSON.parse(localStorage.getItem(`cartStorage${element}`))
             console.log(storage)
-            await showApiProduct(storage)
-            totalPrice += storage.price * storage.quantity
-            totalQuantity += parseInt(storage.quantity)
-            document.getElementById('totalQuantity').textContent = totalQuantity
-            document.getElementById('totalPrice').textContent = totalPrice
+            for ( let product = 0 ; product < products.length ; product++) {
+                if (products[product]._id == storage.id) {
+                    console.log(storage)
+                    await showApiProduct(storage, products[product].price)
+                    totalPrice += products[product].price * storage.quantity
+                    totalQuantity += parseInt(storage.quantity)
+                    document.getElementById('totalQuantity').textContent = totalQuantity
+                    document.getElementById('totalPrice').textContent = totalPrice
+                }
+            }
         }
         listen()
         listenForm()
@@ -107,9 +104,7 @@ const main = async () => {
     }
 }
 
-main()
-
-
+retrieveProductsData()
 
 
 // Fonction de suppression et de changement de quantité
@@ -197,14 +192,15 @@ const city = document.getElementById('city')
 const cityError = document.getElementById('cityErrorMsg')
 const email = document.getElementById('email')
 const emailError = document.getElementById('emailErrorMsg')
+const order = document.getElementById('order')
 
 // Règles regex
-const validName = RegExp(/^[a-zA-Z\-]+$/) // ne doit être composé que de lettres min ou maj et tiré
-const validCity = RegExp(/^[a-zA-Z\- ]+$/) // lettres min MAJ, espaces, une ou plusieurs fois
-const validAddress = RegExp(/^[0-9a-zA-Z\- ]+$/) // lettres min MAJ, chiffres, espaces, une ou plusieurs fois
-const validEmail = RegExp(/^[0-9a-z\-_.]+@[0-9a-zA-Z\-_.][.][a-z]{2,3}$/)
+const validName = RegExp(/^[A-zÀ-ú\-]+$/) // ne doit être composé que de lettres min ou maj et tiré
+const validCity = RegExp(/^[A-zÀ-ú\- ]+$/) // lettres min MAJ, espaces, une ou plusieurs fois
+const validAddress = RegExp(/^[0-9A-zÀ-ú\- ]+$/) // lettres min MAJ, chiffres, espaces, une ou plusieurs fois
+const validEmail = RegExp(/^[0-9a-z\-_.]+@[0-9a-z\-_.]+.[a-z]{2,3}$/)
 
-
+// Validation du prénom
 const validationFirstName = (name) => {
     var valid = false
     if (name.match(validName)) {
@@ -216,6 +212,7 @@ const validationFirstName = (name) => {
     return valid
 }
 
+// Validation du nom
 const validationLastName = (name) => {
     var valid = false
     if (name.match(validName)) {
@@ -227,6 +224,7 @@ const validationLastName = (name) => {
     return valid
 }
 
+// Validation de la ville
 const validationCity = (name) => {
     var valid = false
     if (name.match(validCity)) {
@@ -238,6 +236,7 @@ const validationCity = (name) => {
     return valid
 }
 
+// Validation de l'adresse
 const validationAddress = (name) => {
     var valid = false
     if (name.match(validAddress)) {
@@ -249,17 +248,19 @@ const validationAddress = (name) => {
     return valid
 }
 
+// Validation de l'email
 const validationEmail = (name) => {
     var valid = false
     if (name.match(validEmail)) {
         valid = true
-        addressError.textContent = ''
+        emailError.textContent = ''
     } else {
-        addressError.textContent = "Votre email n'est pas valide"
+        emailError.textContent = "Votre email n'est pas valide"
     }
     return valid
 }
 
+// Validation du formulaire
 const listenForm = () => {
     firstName.addEventListener('change', event => {
         console.log(firstName.value)
@@ -277,5 +278,16 @@ const listenForm = () => {
     })
     email.addEventListener('change', event => {
         var vEmail = validationEmail(email.value)
+    })
+}
+
+// Envoie du formulaire et du panier à l'API
+const productOrder = (validOrder) => {
+    order.addEventListener('click', event => {
+        if (validOrder == true) {
+
+        } else {
+            alert('Veuillez remplir le formulaire')
+        }
     })
 }
