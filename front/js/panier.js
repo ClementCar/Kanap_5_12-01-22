@@ -101,6 +101,7 @@ const main = async () => {
             document.getElementById('totalPrice').textContent = totalPrice
         }
         listen()
+        listenForm()
     } else {
         // message de panier vide 
     }
@@ -108,7 +109,13 @@ const main = async () => {
 
 main()
 
+
+
+
+// Fonction de suppression et de changement de quantité
 function listen() {
+
+    // Suppression d'élement du panier
     var deleteItem = document.querySelectorAll('.deleteItem')
     console.log(deleteItem)
     console.log('on est la')
@@ -118,37 +125,62 @@ function listen() {
         const $deleteColor = $deleteArticle.dataset.color
         console.log($deleteId)
         console.log($deleteColor)
+        const lastLength = localStorage.length
         for ( element = 0 ; element < localStorage.length ; element++) {
             var storage = JSON.parse(localStorage.getItem(`cartStorage${element}`))
             console.log(storage.id)
             console.log(storage.colors)
 
-            // Si le produit est déja dans le panier, on le remplace avec la nouvelle quantité
+            // Le produit sélectionné est supprimé de local Storage
             if (( $deleteId === storage.id)&&(storage.colors === $deleteColor)) {
                 localStorage.removeItem(`cartStorage${element}`)
+
+                // On remet les numéros de local Storage dans l'ordre pour qu'il n'y ai pas de vide
+                for ( newNumb = element + 1 ; newNumb < lastLength ; newNumb++) {
+                    var newStorage = JSON.parse(localStorage.getItem(`cartStorage${newNumb}`))
+                    localStorage.removeItem(`cartStorage${newNumb}`)
+                    localStorage.setItem(`cartStorage${newNumb - 1}`, JSON.stringify(newStorage))
+                }
             }
         }
         window.location.reload()
         alert('Produit supprimé du panier')
     }))
+
+    // Changement de quantité
+    var changeQuantity = document.querySelectorAll('.itemQuantity')
+    changeQuantity.forEach(changeQuantity => changeQuantity.addEventListener('change', event => {
+        const $changeArticle = changeQuantity.closest('article')
+        const $changeId = $changeArticle.dataset.id
+        const $changeColor = $changeArticle.dataset.color
+        console.log($changeColor)
+        console.log($changeId)
+        console.log(changeQuantity.value)
+        const lastLength = localStorage.length
+        for ( element = 0 ; element < localStorage.length ; element++) {
+            var storage = JSON.parse(localStorage.getItem(`cartStorage${element}`))
+    
+            // On remplace le produit avec la nouvelle quantité
+            if (($changeId === storage.id)&&(storage.colors === $changeColor)) {
+                storage.quantity = changeQuantity.value
+                if (storage.quantity > 0) {
+                    localStorage.removeItem(`cartStorage${element}`)
+                    localStorage.setItem(`cartStorage${element}`, JSON.stringify(storage))
+                } else {
+                    localStorage.removeItem(`cartStorage${element}`)
+                    for ( newNumb = element + 1 ; newNumb < lastLength ; newNumb++) {
+                        var newStorage = JSON.parse(localStorage.getItem(`cartStorage${newNumb}`))
+                        localStorage.removeItem(`cartStorage${newNumb}`)
+                        localStorage.setItem(`cartStorage${newNumb - 1}`, JSON.stringify(newStorage))
+                    }
+                }
+            }
+        }
+        window.location.reload()
+        alert('Changement de quantité effectué')
+
+    }))
 }
-
-// changeQuantity.addEventListener('change', event => {
-//     const changeArticle = changeQuantity.closest('article')
-//     const $changeId = $deleteArticle.dataset.id
-//     const $changeColor = $deleteArticle.dataset.color
-//     for ( element = 0 ; element < localStorage.length ; element++) {
-//         var storage = JSON.parse(localStorage.getItem(`cartStorage${element}`))
-
-//         // Si le produit est déja dans le panier, on le remplace avec la nouvelle quantité
-//         if (($changeId === storage.id)&&(storage.colors === $changeColor)) {
-//             var newQuantity = parseInt(cart.quantity) + parseInt(storage.quantity)
-//             storage.quantity = newQuantity
-//             localStorage.removeItem(`cartStorage${element}`)
-//             localStorage.setItem(`cartStorage${element}`, JSON.stringify(storage))
-//         }
-//     }
-// })
 
 
 
@@ -167,6 +199,83 @@ const email = document.getElementById('email')
 const emailError = document.getElementById('emailErrorMsg')
 
 // Règles regex
-const validFlc = RegExp()
-const validAddress = RegExp()
-const validEmail = RegExp()
+const validName = RegExp(/^[a-zA-Z\-]+$/) // ne doit être composé que de lettres min ou maj et tiré
+const validCity = RegExp(/^[a-zA-Z\- ]+$/) // lettres min MAJ, espaces, une ou plusieurs fois
+const validAddress = RegExp(/^[0-9a-zA-Z\- ]+$/) // lettres min MAJ, chiffres, espaces, une ou plusieurs fois
+const validEmail = RegExp(/^[0-9a-z\-_.]+@[0-9a-zA-Z\-_.][.][a-z]{2,3}$/)
+
+
+const validationFirstName = (name) => {
+    var valid = false
+    if (name.match(validName)) {
+        valid = true
+        firstNameError.textContent = ''
+    } else {
+        firstNameError.textContent = "Votre prénom n'est pas valide"
+    }
+    return valid
+}
+
+const validationLastName = (name) => {
+    var valid = false
+    if (name.match(validName)) {
+        valid = true
+        lastNameError.textContent = ''
+    } else {
+        lastNameError.textContent = "Votre nom n'est pas valide"
+    }
+    return valid
+}
+
+const validationCity = (name) => {
+    var valid = false
+    if (name.match(validCity)) {
+        valid = true
+        cityError.textContent = ''
+    } else {
+        cityError.textContent = "Votre ville n'est pas valide"
+    }
+    return valid
+}
+
+const validationAddress = (name) => {
+    var valid = false
+    if (name.match(validAddress)) {
+        valid = true
+        addressError.textContent = ''
+    } else {
+        addressError.textContent = "Votre adresse n'est pas valide"
+    }
+    return valid
+}
+
+const validationEmail = (name) => {
+    var valid = false
+    if (name.match(validEmail)) {
+        valid = true
+        addressError.textContent = ''
+    } else {
+        addressError.textContent = "Votre email n'est pas valide"
+    }
+    return valid
+}
+
+const listenForm = () => {
+    firstName.addEventListener('change', event => {
+        console.log(firstName.value)
+        var fName = validationFirstName(firstName.value)
+        console.log(fName)
+    })
+    lastName.addEventListener('change', event => {
+        var lName = validationLastName(lastName.value)
+    })
+    city.addEventListener('change', event => {
+        var vCity = validationCity(city.value)
+    })
+    address.addEventListener('change', event => {
+        var vAddress = validationAddress(address.value)
+    })
+    email.addEventListener('change', event => {
+        var vEmail = validationEmail(email.value)
+    })
+}
