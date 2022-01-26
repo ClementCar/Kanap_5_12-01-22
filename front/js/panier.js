@@ -1,5 +1,14 @@
 var totalQuantity = 0
 var totalPrice = 0
+var useless = false
+
+// Déclaration de variable à envoyer à l'API
+var products = new Array()
+var contact = new Object()
+var sendOrder = {
+    contact,
+    products
+}
 
 // Récupere les produits de l'API pour récupérer le prix
 const retrieveProductsData = () => {
@@ -79,26 +88,30 @@ const showApiProduct = (product, price) => {
 }
 
 // Appel l'affichage pour chaque produit du panier 
-const main = async (products) => {
+const main = async (allProducts) => {
     var articleCart = localStorage.length
-    console.table(products)
+    console.table(allProducts)
     if ( articleCart > 0) {
         for ( element = 0 ; element < localStorage.length ; element++) {
             var storage = JSON.parse(localStorage.getItem(`cartStorage${element}`))
             console.log(storage)
-            for ( let product = 0 ; product < products.length ; product++) {
-                if (products[product]._id == storage.id) {
+            products.push(storage.id)
+            for ( let product = 0 ; product < allProducts.length ; product++) {
+                if (allProducts[product]._id == storage.id) {
                     console.log(storage)
-                    await showApiProduct(storage, products[product].price)
-                    totalPrice += products[product].price * storage.quantity
+                    await showApiProduct(storage, allProducts[product].price)
+                    totalPrice += allProducts[product].price * storage.quantity
                     totalQuantity += parseInt(storage.quantity)
                     document.getElementById('totalQuantity').textContent = totalQuantity
                     document.getElementById('totalPrice').textContent = totalPrice
                 }
             }
         }
+        console.log(products)
         listen()
         listenForm()
+        // console.log("Formulaire non valide", validForm)
+        productOrder()
     } else {
         // message de panier vide 
     }
@@ -182,15 +195,15 @@ function listen() {
 
 
 // Récupération des données du formulaires
-const firstName = document.getElementById('firstName')
+const inputFirstName = document.getElementById('firstName')
 const firstNameError = document.getElementById('firstNameErrorMsg')
-const lastName = document.getElementById('lastName')
+const inputLastName = document.getElementById('lastName')
 const lastNameError = document.getElementById('lastNameErrorMsg')
-const address = document.getElementById('address')
+const inputAddress = document.getElementById('address')
 const addressError = document.getElementById('addressErrorMsg')
-const city = document.getElementById('city')
+const inputCity = document.getElementById('city')
 const cityError = document.getElementById('cityErrorMsg')
-const email = document.getElementById('email')
+const inputEmail = document.getElementById('email')
 const emailError = document.getElementById('emailErrorMsg')
 const order = document.getElementById('order')
 
@@ -260,34 +273,75 @@ const validationEmail = (name) => {
     return valid
 }
 
-// Validation du formulaire
+var fName = false
+var lName = false
+var vCity = false
+var vAddress = false
+var vEmail = false
+
+
+
+
+
+
+// Validation du formulaire, retourne true si il est bien rempli
 const listenForm = () => {
-    firstName.addEventListener('change', event => {
-        console.log(firstName.value)
-        var fName = validationFirstName(firstName.value)
-        console.log(fName)
+    inputFirstName.addEventListener('change', event => {
+        fName = validationFirstName(inputFirstName.value)
+        listenForm()
     })
-    lastName.addEventListener('change', event => {
-        var lName = validationLastName(lastName.value)
+    inputLastName.addEventListener('change', event => {
+        lName = validationLastName(inputLastName.value)
+        listenForm()
     })
-    city.addEventListener('change', event => {
-        var vCity = validationCity(city.value)
+    inputCity.addEventListener('change', event => {
+        vCity = validationCity(inputCity.value)
+        listenForm()
     })
-    address.addEventListener('change', event => {
-        var vAddress = validationAddress(address.value)
+    inputAddress.addEventListener('change', event => {
+        vAddress = validationAddress(inputAddress.value)
+        listenForm()
     })
-    email.addEventListener('change', event => {
-        var vEmail = validationEmail(email.value)
+    inputEmail.addEventListener('change', event => {
+        vEmail = validationEmail(inputEmail.value)
+        listenForm()
     })
+    console.log(sendOrder)
+    if ((fName == true)&&(lName == true)&&(vCity == true)&&(vAddress == true)&&(vEmail == true)) {
+        contact.firstName = inputFirstName.value
+        contact.lastName = inputLastName.value
+        contact.address = inputAddress.value
+        contact.city = inputCity.value
+        contact.email = inputEmail.value
+        return true
+    } else {
+        return false
+    }
 }
 
 // Envoie du formulaire et du panier à l'API
-const productOrder = (validOrder) => {
+const productOrder = () => {
     order.addEventListener('click', event => {
+        var validOrder = listenForm()
+        console.log(validOrder)
+        console.log(sendOrder)
         if (validOrder == true) {
+            alert('Formulaire valide')
+            // fetch("http://127.0.0.1:3000/api/products/order", {
+            //     method: "POST",
+            //     headers: {
+            // 'Accept': 'application/json',
+            // 'Content-Type': 'applicaton/json'
+            //     },
+            //     body: JSON.stringify(sendOrder)
+            // })
+            // .then(res => res.json())
+            // .then(function(data) {
 
+            // })
+            // .catch(err => console.log("erreur", err))
         } else {
-            alert('Veuillez remplir le formulaire')
+            alert('Formulaire non valide')
         }
     })
 }

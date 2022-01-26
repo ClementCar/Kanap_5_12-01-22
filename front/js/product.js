@@ -99,7 +99,6 @@ const listen = (data) => {
             quantity : document.getElementById('quantity').value,
             colors : document.getElementById('colors').value,
             name : data.name,
-            price : data.price,
             image : data.imageUrl,
             description : data.description,
             altTxt : data.altTxt
