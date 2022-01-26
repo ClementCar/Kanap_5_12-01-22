@@ -327,19 +327,20 @@ const productOrder = () => {
         console.log(sendOrder)
         if (validOrder == true) {
             alert('Formulaire valide')
-            // fetch("http://127.0.0.1:3000/api/products/order", {
-            //     method: "POST",
-            //     headers: {
-            // 'Accept': 'application/json',
-            // 'Content-Type': 'applicaton/json'
-            //     },
-            //     body: JSON.stringify(sendOrder)
-            // })
-            // .then(res => res.json())
-            // .then(function(data) {
-
-            // })
-            // .catch(err => console.log("erreur", err))
+            fetch("http://127.0.0.1:3000/api/products/order", {
+                method: "POST",
+                headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'applicaton/json'
+                },
+                body: JSON.stringify(sendOrder)
+            })
+            .then(res => res.json())
+            .then(function(data) {
+                document.location.href = 'http://127.0.0.1:5500/front/html/confirmation.html'
+                document.getElementById('orderId').textContent = data.orderId
+            })
+            .catch(err => console.log("erreur", err))
         } else {
             alert('Formulaire non valide')
         }
