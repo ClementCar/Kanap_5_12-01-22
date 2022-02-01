@@ -87,7 +87,6 @@ const listen = (data) => {
     addCart.addEventListener('click', event => {
         if (($itemColors.value != "")&&($itemQuantity.value > 0)&&($itemQuantity.value < 101)) {
             var count = localStorage.length 
-            console.log(count)
             var cart = {
                 id : findProduct(),
                 quantity : document.getElementById('quantity').value,
@@ -102,25 +101,18 @@ const listen = (data) => {
             if ( count > 0) {
                 for ( element = 0 ; element < localStorage.length ; element++) {
                     var storage = JSON.parse(localStorage.getItem(`cartStorage${element}`))
-                    console.log(storage)
 
                     // Si le produit est déja dans le panier, on le remplace avec la nouvelle quantité
                     if ((cart.id === storage.id)&&(storage.colors === cart.colors)) {
                         same = true
-                        console.log(same)
-                        console.log(cart.quantity)
-                        console.log(storage.quantity)
                         var newQuantity = parseInt(cart.quantity) + parseInt(storage.quantity)
-                        console.log(newQuantity)
                         cart.quantity = newQuantity
-                        console.log(cart.quantity)
                         localStorage.removeItem(`cartStorage${element}`)
                         localStorage.setItem(`cartStorage${element}`, JSON.stringify(cart))
                     }
                 }
                 // Si le produit n'est pas dans le panier alors on l'ajoute
                 if (same == false) {
-                    console.log(same)
                     localStorage.setItem(`cartStorage${count}`, JSON.stringify(cart))
                 }
             } else {

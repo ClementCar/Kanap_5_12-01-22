@@ -338,7 +338,7 @@ const productOrder = () => {
                 .then(res => res.json())
                 .then(function(data) {
                     console.log(data)
-                    document.location.href = `http://127.0.0.1:5500/front/html/confirmation.html?orderId=${data.orderId}`
+                    document.location.href = `http://localhost:5500/front/html/confirmation.html?orderId=${data.orderId}`
                     localStorage.clear()
                 })
                 .catch(err => console.log("erreur", err))

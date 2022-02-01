@@ -18,3 +18,8 @@ Construisez un site e-commerce en JavaScript
 ## Languages
 
 - JavaScript
+
+## Notes 
+
+Le Front-end du projet est défini sur le port **5500**.
+Si vous utilisez un autre port, veuillez modifier le fichier /front/js/cart.js à la ligne 341.
